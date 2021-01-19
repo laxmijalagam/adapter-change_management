@@ -117,6 +117,8 @@ healthcheck(callback) {
       * for the callback's errorMessage parameter.
       */
       this.emitOffline();     
+       log.info('Service now adapter is offline User: ${this.props.auth.username} Adapter ID: ${this.id}, Error Detail: ${JSON.stringify(error)}');
+      
       callbackError = error;
    } else {
      /**
