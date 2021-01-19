@@ -83,7 +83,7 @@ class ServiceNowAdapter extends EventEmitter {
     this.healthcheck();
   }
 
-/**
+  /**
  * @memberof ServiceNowAdapter
  * @method healthcheck
  * @summary Check ServiceNow Health
@@ -101,6 +101,8 @@ healthcheck(callback) {
     * or the instance was hibernating. You must write
     * the blocks for each branch.
     */
+    let callbackData = null;
+    let callbackError = null;
    if (error) {
      /**
       * Write this block.
@@ -114,9 +116,8 @@ healthcheck(callback) {
       * healthcheck(), execute it passing the error seen as an argument
       * for the callback's errorMessage parameter.
       */
-      this.emitOffline();  
-      log.info('Service now adapter is offline, Error Details: ${JSON.stringify(error)}');
-         
+      this.emitOffline();     
+      callbackError = error;
    } else {
      /**
       * Write this block.
@@ -128,11 +129,12 @@ healthcheck(callback) {
       * parameter as an argument for the callback function's
       * responseData parameter.
       */
-       this.emitOnline();
-   }
+      this.emitOnline();      
+      callbackData = result;
+   }   
  });
+ 
 }
-
   /**
    * @memberof ServiceNowAdapter
    * @method emitOffline
@@ -186,7 +188,7 @@ healthcheck(callback) {
      * Note how the object was instantiated in the constructor().
      * get() takes a callback function.
      */
-    this.connector.get((data, error) => {
+     this.connector.get((data, error) => {
         if (error) {
           callback(data, error);} 
         else {
@@ -201,7 +203,6 @@ healthcheck(callback) {
                                    "description" : result_array[i].description, "work_start" : result_array[i].work_start, "work_end" : result_array[i].work_end,
                                    "change_ticket_key" : result_array[i].sys_id});
               } 
-
             callback(changeTicket, error); 
             }
           } 
@@ -225,9 +226,9 @@ healthcheck(callback) {
      * post() takes a callback function.
      */
      this.connector.post((data, error) => {
-          if (error) {            
-            callback(data, error);} 
-          else {
+          if (error) {
+             callback(data, error);} 
+        else {
             if (data.hasOwnProperty('body')) {
               var changeTicket = {};
               var result_array = (JSON.parse(data.body).result);
